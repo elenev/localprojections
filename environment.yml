@@ -1,4 +1,4 @@
-name: ectx
+name: ectxtest
 channels:
   - defaults
 dependencies:
@@ -11,5 +11,4 @@ dependencies:
   - pip>=23.0.1
   - pip:
     - linearmodels>=4.27
-
-#prefix: C:\Users\elene\anaconda3\envs\ectx
+#prefix: C:\Users\elene\anaconda3\envs\ectxtest
