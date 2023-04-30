@@ -1,0 +1,6 @@
+python:
+  version: 3.x
+  install:
+    - requirements: docs/requirements.txt
+sphinx:
+  configuration: docs/conf.py
