@@ -30,8 +30,8 @@ class LP:
     endogvars : dict or list, optional
         Lagged variables to include in the model. The default is None, in which case all variables
         are included. If a dict is supplied, the keys are the names of the variables and the values
-        are the lags to include. Lags can be an integer ``n``, in which case lags will be 1,...,``n''.
-        Lags can also be a tuple ``(n,m)``, in which case lags will be ``n,...,m```. Or they can be an
+        are the lags to include. Lags can be an integer ``n``, in which case lags will be ``1,...,n``.
+        Lags can also be a tuple ``(n,m)``, in which case lags will be ``n,...,m``. Or they can be an
         exact list of lags. If a list is supplied, maxlags is used to determine the lags.
     responsevars : list or string, optional
         List of variables to use as response variables. The default is None, in which case all
@@ -74,31 +74,32 @@ class LP:
     Notes
     -----
     Jorda (2005) defines local projections as a series of separately estimated regressions where
-    a shock at time $t$ is used to predict the response variable at time $t+h$ for $h=0,1,...$.
+    a shock at time :math:`t` is used to predict the response variable at time :math:`t+h` 
+    for :math:`h=0,1,...,H`.
 
     Without exogenously identified shocks, the model is written as:
+    
     .. math::
-
-        y_{t+h} = \\alpha_{h} + \\sum_{s=1}^p \\beta_{h,s}' x_{t-s} + \\epsilon_{t+h}, h=0,1,...
-
-    where :math: `y_{t+h}` is the response variable at time :math: `t+h`, :math: `x_{t-s}` is 
-    the vector of endogenous variables at time :math: `t-s` (potentially including :math: `y_{t}`).
-    The impulse response to the reduced-form shock is :math: ``\\hat{beta}_{h,1}``. It is transformed
-    into a structural shock using the identification matrix :math: `B` such that 
+        y_{t+h} = \alpha_{h} + \sum_{s=1}^p \beta_{h,s}' x_{t-s} + \epsilon_{t+h}, \qquad h=0,1,...,H 
+    
+    where :math:`y_{t+h}` is the response variable at time :math:`t+h`, :math:`x_{t-s}` is 
+    the vector of endogenous variables at time :math:`t-s` (potentially including :math:`y_{t}`).
+    The impulse response to the reduced-form shock is :math:`\hat{beta}_{h,1}`. It is transformed
+    into a structural shock using the identification matrix :math:`B` such that 
+    
     .. math::
+        I(h) = B \hat{\beta}_{h,1}
 
-        I(h) = B \\hat{\\beta}_{h,1}
-
-    :math: `B` is computed separately. By default, it will be estimated using the Cholesky decomposition
+    :math:`B` is computed separately. By default, it will be estimated using the Cholesky decomposition
     of the equivalent VAR(p) model. Alternatively, the user can supply an identification matrix.
 
     With exogenously identified shocks, the model is written as:
-    .. math::
 
-        y_{t+h} = \\alpha_{h} + \\beta_h' z_t + \\sum_{s=1}^p \\gamma_{h,s}' x_{t-s} + \\epsilon_{t+h}, h=0,1,...
+    .. math::
+        y_{t+h} = \alpha_{h} + \beta_h' z_t + \sum_{s=1}^p \gamma_{h,s}' x_{t-s} + \epsilon_{t+h}, \qquad h=0,1,...,H 
     
-    A panel version estimates effect :math: `\\beta_h` of :math: `x_{i,t-1}` on :math: `y_{i,t+h}` using
-    fixed effects :math: `\\alpha_{i,h}`.
+    A panel version estimates effect :math:`\beta_h` of :math:`x_{i,t-1}` on :math:`y_{i,t+h}` using
+    fixed effects :math:`\alpha_{i,h}`.
     """
 
         
@@ -510,8 +511,8 @@ class LP:
                 - ``lb``: lower bound of the confidence interval
                 - ``ub``: upper bound of the confidence interval
             Each dictionary value is a DataFrame with a row for each response variable and
-            a column for each impulse variable and lag. ``df[y,(x,s)]`` represents ``(y,x)``th element
-            of the ``s``th lag of the VAR.
+            a column for each impulse variable and lag. ``df[y,(x,s)]`` represents ``(y,x)`` th element
+            of the ``s`` th lag of the VAR.
         Sigma : DataFrame
             DataFrame containing the covariance matrix of the residuals.
         """

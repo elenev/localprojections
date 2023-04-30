@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
    
@@ -36,6 +37,446 @@
 <h1>Welcome to localprojections’s documentation!<a class="headerlink" href="#welcome-to-localprojections-s-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<span class="target" id="module-localprojections"></span><dl class="py class">
+<dt class="sig sig-object py" id="localprojections.LP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">LP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endogvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">responsevars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ci</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timelevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cholesky'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The LP class implements the local projections methodology of Jorda (2005) and the R package 
+lpirfs.</p>
+<dl class="simple">
+<dt>df<span class="classifier">pandas.DataFrame </span></dt><dd><p>DataFrame containing the time series or panel data to be used in the estimation.</p>
+</dd>
+<dt>maxlags<span class="classifier">int, optional</span></dt><dd><p>Maximum number of lags to include in the model. The default is 1.</p>
+</dd>
+<dt>sample<span class="classifier">function, optional</span></dt><dd><p>Function that takes a pandas.DataFrame and returns a boolean array of the same length 
+indicating whether to include that observation in the estimation. The default is True for all.
+Reason for this is that the user may want to exclude observations after lags are computed.</p>
+</dd>
+<dt>endogvars<span class="classifier">dict or list, optional</span></dt><dd><p>Lagged variables to include in the model. The default is None, in which case all variables
+are included. If a dict is supplied, the keys are the names of the variables and the values
+are the lags to include. Lags can be an integer <code class="docutils literal notranslate"><span class="pre">n</span></code>, in which case lags will be <code class="docutils literal notranslate"><span class="pre">1,...,n</span></code>.
+Lags can also be a tuple <code class="docutils literal notranslate"><span class="pre">(n,m)</span></code>, in which case lags will be <code class="docutils literal notranslate"><span class="pre">n,...,m</span></code>. Or they can be an
+exact list of lags. If a list is supplied, maxlags is used to determine the lags.</p>
+</dd>
+<dt>responsevars<span class="classifier">list or string, optional</span></dt><dd><p>List of variables to use as response variables. The default is None, in which case all
+<code class="docutils literal notranslate"><span class="pre">endogvars</span></code> are used.</p>
+</dd>
+<dt>shocks<span class="classifier">list or string, optional</span></dt><dd><p>List of variables to use as shocks. The default is None, in which case endogvars are used.
+If shocks are not supplied, identification must be supplied to indicate how reduced-form
+innovations in endogvars are transformed into structural shocks.</p>
+</dd>
+<dt>ci<span class="classifier">float, optional</span></dt><dd><p>Confidence interval to use for the impulse response plots. The default is 90%.</p>
+</dd>
+<dt>use_t<span class="classifier">bool, optional</span></dt><dd><p>In the case of time series data, whether to use t-statistics instead of z-statistics. The default
+is True. This is ignored for panel data, which always uses t-statistics.</p>
+</dd>
+<dt>use_correction<span class="classifier">bool, optional</span></dt><dd><p>In the case of time series data, whether to use small sample correction for the standard errors.
+The default is True. This is ignored for panel data, which always uses small sample correction.</p>
+</dd>
+<dt>interaction<span class="classifier">string, optional</span></dt><dd><p>Name of the variable to use for interaction terms. The default is None, in which case no
+interaction terms are used. If a categorical variable is supplied, a separate IRF path is 
+computed for each level. If a continuous variable is supplied, the base effect and interaction
+effect are computed.</p>
+</dd>
+<dt>timelevel<span class="classifier">string, optional</span></dt><dd><p>Name of the time index in the DataFrame. The default is None, in which case the last index
+is assumed to be the time index.</p>
+</dd>
+<dt>cluster<span class="classifier">bool or string, optional</span></dt><dd><p>Whether to use clustered standard errors in panel estimation. If True, all index levels
+other than the time index are used for clustering. If a string, that variable is used.
+If None, Driscoll-Kraay standard errors with Bartlett Kernel are used with a bandwidth of
+<code class="docutils literal notranslate"><span class="pre">horizon</span> <span class="pre">+</span> <span class="pre">1</span></code>. cluster is ignored for time series data, which always uses Newey-West standard
+errors with a bandwidth of <code class="docutils literal notranslate"><span class="pre">horizon</span> <span class="pre">+</span> <span class="pre">1</span></code>.</p>
+</dd>
+<dt>identification<span class="classifier">string or 2D ndarray, optional</span></dt><dd><p>Method to use for identification if no shocks are supplied. 
+The default is <code class="docutils literal notranslate"><span class="pre">'cholesky'</span></code>, in which case the Cholesky decomposition of the reduced-form
+covariance matrix is used using the ordering in endogvars. If a 2D ndarray is supplied, 
+it is used as the identification matrix.</p>
+</dd>
+<dt>trend<span class="classifier">int, optional</span></dt><dd><p>Order of polynomial trend to include in the model. The default is 0, in which case no trend
+is included. If 1, a linear trend is included. If 2, a quadratic trend is included, etc.</p>
+</dd>
+</dl>
+<p>Jorda (2005) defines local projections as a series of separately estimated regressions where
+a shock at time <span class="math notranslate nohighlight">\(t\)</span> is used to predict the response variable at time <span class="math notranslate nohighlight">\(t+h\)</span> 
+for <span class="math notranslate nohighlight">\(h=0,1,...,H\)</span>.</p>
+<p>Without exogenously identified shocks, the model is written as:</p>
+<div class="math notranslate nohighlight">
+\[y_{t+h} = \alpha_{h} + \sum_{s=1}^p \beta_{h,s}' x_{t-s} + \epsilon_{t+h}, \qquad h=0,1,...,H \]</div>
+<p>where <span class="math notranslate nohighlight">\(y_{t+h}\)</span> is the response variable at time <span class="math notranslate nohighlight">\(t+h\)</span>, <span class="math notranslate nohighlight">\(x_{t-s}\)</span> is 
+the vector of endogenous variables at time <span class="math notranslate nohighlight">\(t-s\)</span> (potentially including <span class="math notranslate nohighlight">\(y_{t}\)</span>).
+The impulse response to the reduced-form shock is <span class="math notranslate nohighlight">\(\hat{beta}_{h,1}\)</span>. It is transformed
+into a structural shock using the identification matrix <span class="math notranslate nohighlight">\(B\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[I(h) = B \hat{\beta}_{h,1}\]</div>
+<p><span class="math notranslate nohighlight">\(B\)</span> is computed separately. By default, it will be estimated using the Cholesky decomposition
+of the equivalent VAR(p) model. Alternatively, the user can supply an identification matrix.</p>
+<p>With exogenously identified shocks, the model is written as:</p>
+<div class="math notranslate nohighlight">
+\[y_{t+h} = \alpha_{h} + \beta_h' z_t + \sum_{s=1}^p \gamma_{h,s}' x_{t-s} + \epsilon_{t+h}, \qquad h=0,1,...,H \]</div>
+<p>A panel version estimates effect <span class="math notranslate nohighlight">\(\beta_h\)</span> of <span class="math notranslate nohighlight">\(x_{i,t-1}\)</span> on <span class="math notranslate nohighlight">\(y_{i,t+h}\)</span> using
+fixed effects <span class="math notranslate nohighlight">\(\alpha_{i,h}\)</span>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.design_matrices">
+<span class="sig-name descname"><span class="pre">design_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">responsevar</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.design_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function generates the design matrices for the regression. It is used internally by the
+<code class="docutils literal notranslate"><span class="pre">estimate</span></code> and <code class="docutils literal notranslate"><span class="pre">orthogonalize</span></code> methods. It will always return the design matrices for
+a contemporaneous regression. Subsequent lags are handled by the <code class="docutils literal notranslate"><span class="pre">shift_lhs</span></code> method. This is
+done for efficiency, since creating the design matrices can be quite slow.</p>
+<dl class="simple">
+<dt>rhs<span class="classifier">string</span></dt><dd><p>Right-hand side of the regression.</p>
+</dd>
+<dt>responsevar<span class="classifier">string</span></dt><dd><p>Response variable of the regression (LHS)</p>
+</dd>
+</dl>
+<p>This function uses the <code class="docutils literal notranslate"><span class="pre">patsy</span></code> package to generate the design matrices. Maybe in the future
+we will switch to <code class="docutils literal notranslate"><span class="pre">formulaic</span></code> which is faster.</p>
+<dl class="simple">
+<dt>dflhs<span class="classifier">DataFrame</span></dt><dd><p>LHS design matrix</p>
+</dd>
+<dt>dfrhs<span class="classifier">DataFrame</span></dt><dd><p>RHS design matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_horizon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shock_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method estimates the impulse response functions using local projections.</p>
+<dl class="simple">
+<dt>max_horizon<span class="classifier">int</span></dt><dd><p>Maximum horizon to compute the impulse response functions.</p>
+</dd>
+<dt>shock_size<span class="classifier">float, optional</span></dt><dd><p>Size of the shock. The default is 1 for identified shocks and standard deviation
+for orthogonalized shocks.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>coefs<span class="classifier">DataFrame</span></dt><dd><dl class="simple">
+<dt>DataFrame containing the impulse response functions. The indices are:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">response</span></code>: response variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">impulse</span></code>: impulse variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">horizon</span></code>: horizon</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interaction</span></code>: interaction variable (if applicable)</p></li>
+</ul>
+</dd>
+<dt>The columns are:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coef</span></code>: impulse response function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lb</span></code>: lower bound of the confidence interval</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ub</span></code>: upper bound of the confidence interval</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>regresults<span class="classifier">dict</span></dt><dd><p>Nested dictionary containing the regression results. The keys are the horizons
+and the values are dictionaries containing the regression results for each spec.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.estimate_var">
+<span class="sig-name descname"><span class="pre">estimate_var</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.estimate_var" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function estimates a VAR model. It is used internally by the <code class="docutils literal notranslate"><span class="pre">orthogonalize</span></code> method
+to estimate the covariance matrix of the residuals, which is used to orthogonalize the
+shocks.</p>
+<dl>
+<dt>const<span class="classifier">DataFrame</span></dt><dd><p>DataFrame containing the constant term of the VAR model.</p>
+</dd>
+<dt>outcoefs<span class="classifier">dict</span></dt><dd><dl class="simple">
+<dt>Dictionary containing the coefficients of the VAR model. The keys are:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coef</span></code>: coefficients</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lb</span></code>: lower bound of the confidence interval</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ub</span></code>: upper bound of the confidence interval</p></li>
+</ul>
+</dd>
+</dl>
+<p>Each dictionary value is a DataFrame with a row for each response variable and
+a column for each impulse variable and lag. <code class="docutils literal notranslate"><span class="pre">df[y,(x,s)]</span></code> represents <code class="docutils literal notranslate"><span class="pre">(y,x)</span></code> th element
+of the <code class="docutils literal notranslate"><span class="pre">s</span></code> th lag of the VAR.</p>
+</dd>
+<dt>Sigma<span class="classifier">DataFrame</span></dt><dd><p>DataFrame containing the covariance matrix of the residuals.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.gen_rhs">
+<span class="sig-name descname"><span class="pre">gen_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endogvars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">responsevars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_interaction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.gen_rhs" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function generates the right-hand side of the model. It is used internally by the
+<code class="docutils literal notranslate"><span class="pre">estimate</span></code> and <code class="docutils literal notranslate"><span class="pre">orthogonalize</span></code> methods.</p>
+<dl class="simple">
+<dt>endogvars<span class="classifier">dict, optional</span></dt><dd><p>Lagged variables to include in the model. The default is None, in which the object
+instance’s <code class="docutils literal notranslate"><span class="pre">endogvars</span></code> attribute is used.</p>
+</dd>
+<dt>shocks<span class="classifier">list, optional</span></dt><dd><p>List of variables to use as shocks. The default is None, in which case the object
+instance’s <code class="docutils literal notranslate"><span class="pre">shocks</span></code> attribute is used.</p>
+</dd>
+<dt>responsevars<span class="classifier">list, optional</span></dt><dd><p>List of variables to use as response variables. The default is None, in which case the object
+instance’s <code class="docutils literal notranslate"><span class="pre">responsevars</span></code> attribute is used.</p>
+</dd>
+<dt>use_interaction<span class="classifier">bool, optional</span></dt><dd><p>Whether to include interaction terms. The default is True, which means the instance’s
+<code class="docutils literal notranslate"><span class="pre">interaction</span></code> attribute is used. False means no interaction terms are used, whatever
+the instance’s <code class="docutils literal notranslate"><span class="pre">interaction</span></code> attribute is. This is useful for the <code class="docutils literal notranslate"><span class="pre">orthogonalize</span></code>
+method, which estimates a VAR model and isnt’ compatible with interaction terms.</p>
+</dd>
+</dl>
+<p>rhs : string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.orthogonalize">
+<span class="sig-name descname"><span class="pre">orthogonalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identification</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.orthogonalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function orthogonalizes the shocks using the supplied identification strategy.</p>
+<dl>
+<dt>identification<span class="classifier">string or ndarray</span></dt><dd><dl class="simple">
+<dt>If <code class="docutils literal notranslate"><span class="pre">identification</span></code> is a string, it must be one of the following:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'cholesky'</span></code>: use the Cholesky decomposition of the covariance matrix of the residuals.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Otherwise, <code class="docutils literal notranslate"><span class="pre">identification</span></code> must be a square matrix with the same number of rows as
+endogenous variables. The matrix must be invertible.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ortho<span class="classifier">function</span></dt><dd><p>Function that takes a vector of shocks and returns a vector of orthogonalized shocks.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.run_regression">
+<span class="sig-name descname"><span class="pre">run_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dflhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nwlags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.run_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function runs the regression for a given horizon. It is used internally by the
+<code class="docutils literal notranslate"><span class="pre">estimate</span></code> and <code class="docutils literal notranslate"><span class="pre">orthogonalize</span></code> methods.</p>
+<dl class="simple">
+<dt>dflhs<span class="classifier">DataFrame</span></dt><dd><p>LHS design matrix</p>
+</dd>
+<dt>dfrhs<span class="classifier">DataFrame</span></dt><dd><p>RHS design matrix</p>
+</dd>
+<dt>nwlags<span class="classifier">int, optional</span></dt><dd><p>Number of Newey-West lags to use. The default is 0, which means no Newey-West correction.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>out<span class="classifier">DataFrame</span></dt><dd><dl class="simple">
+<dt>DataFrame containing the regression results. The columns are:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code>: regression coefficients</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lb</span></code>: lower bound of the confidence interval</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ub</span></code>: upper bound of the confidence interval</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>resids<span class="classifier">Series</span></dt><dd><p>Series containing the regression residuals.</p>
+</dd>
+</dl>
+<p>fit : RegressionResults from OLS or PanelOLSResults from PanelOLS</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="localprojections.LP.shift_lhs">
+<span class="sig-name descname"><span class="pre">shift_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dflhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfrhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.LP.shift_lhs" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function shifts the LHS design matrix by the horizon. It is used internally by the
+<code class="docutils literal notranslate"><span class="pre">estimate</span></code> and <code class="docutils literal notranslate"><span class="pre">orthogonalize</span></code> methods to compute the impulse response functions at
+different horizons. After shifting, the resulting missing rows are removed.</p>
+<dl class="simple">
+<dt>dflhs<span class="classifier">DataFrame</span></dt><dd><p>LHS design matrix</p>
+</dd>
+<dt>dfrhs<span class="classifier">DataFrame</span></dt><dd><p>RHS design matrix</p>
+</dd>
+<dt>horizon<span class="classifier">int, optional</span></dt><dd><p>Horizon to shift the LHS design matrix. The default is 0, which means no shift.</p>
+</dd>
+</dl>
+<p>This function creates copies of the design matrices because the caller may need to use
+the original matrices for other horizons. We can refactor this later to avoid the copies
+if we can be sure that horizons are always incremented sequentially.</p>
+<dl class="simple">
+<dt>dflhs<span class="classifier">DataFrame</span></dt><dd><p>LHS design matrix shifted by the horizon.</p>
+</dd>
+<dt>dfrhs<span class="classifier">DataFrame</span></dt><dd><p>RHS design matrix shifted by the horizon.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.drop_singletons">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">drop_singletons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.drop_singletons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find levels of a MultiIndex that have only one value and drop them.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.fill_index_level">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">fill_index_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.fill_index_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill in missing values in a dataframe index. For MultiIndexes, this doesn’t necessarily generate
+a balanced panel. It just fills in missing times within the entity-specific range of times.</p>
+<dl class="simple">
+<dt>df<span class="classifier">DataFrame</span></dt><dd><p>DataFrame with a MultiIndex to fill.</p>
+</dd>
+<dt>level<span class="classifier">int or str, optional</span></dt><dd><p>Level of the index to fill. The default is 0.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>df<span class="classifier">DataFrame</span></dt><dd><p>DataFrame with filled index.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.flatten">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nested_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively flatten a nested list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.lag">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">lag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cxlevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.lag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lag by <code class="docutils literal notranslate"><span class="pre">n</span></code> periods. If <code class="docutils literal notranslate"><span class="pre">cxlevel</span></code> is supplied, lag within
+each cross-section.</p>
+<dl class="simple">
+<dt>x<span class="classifier">Series, DataFrame, or ndarray</span></dt><dd><p>Object to lag.</p>
+</dd>
+<dt>n<span class="classifier">int, optional</span></dt><dd><p>Number of periods to lag. The default is 0. Negative numbers shift forward.</p>
+</dd>
+<dt>cxlevel<span class="classifier">str or list, optional</span></dt><dd><p>Name of the cross-section level(s) of the index. The default is None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.make_iterable">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">make_iterable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.make_iterable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make an object iterable. If <code class="docutils literal notranslate"><span class="pre">x</span></code> is already iterable, return it.
+Otherwise, if</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code> is an integer, return a list of length n with each element equal to <code class="docutils literal notranslate"><span class="pre">x</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code> is a list, return a dictionary with keys <code class="docutils literal notranslate"><span class="pre">n</span></code> and values <code class="docutils literal notranslate"><span class="pre">x</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.make_polynomial">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">make_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.make_polynomial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a formula for a polynominal of degree <cite>n</cite> in <cite>var</cite>, prepending or postpending
+additional strings if needed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.plot_irf">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">plot_irf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dftmp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impulse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorlevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interaction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorvalues</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend_here</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fcn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.plot_irf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a single impulse response function. This function can be called directly
+by the user or by the <code class="docutils literal notranslate"><span class="pre">plot_irfs</span></code> function that plots a grid of IRFs.</p>
+<dl>
+<dt>dftmp<span class="classifier">DataFrame</span></dt><dd><p>DataFrame containing the impulse responses. The expected contents of the DataFrame
+depend on how the function is called.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>If <code class="docutils literal notranslate"><span class="pre">impulse</span></code> and <code class="docutils literal notranslate"><span class="pre">response</span></code> are both supplied, then <code class="docutils literal notranslate"><span class="pre">dftmp</span></code> can contain multiple</dt><dd><p>IRFs, but its indices must be, in order, <code class="docutils literal notranslate"><span class="pre">impulse</span></code>, <code class="docutils literal notranslate"><span class="pre">response</span></code>, <code class="docutils literal notranslate"><span class="pre">horizon</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>If <code class="docutils literal notranslate"><span class="pre">impulse</span></code> and <code class="docutils literal notranslate"><span class="pre">response</span></code> are not supplied, then <code class="docutils literal notranslate"><span class="pre">dftmp</span></code> must contain a </dt><dd><p>single IRF.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>In either case, the DataFrame must contain the following columns:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coef</span></code>: impulse response function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lb</span></code>: lower bound of the confidence interval</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ub</span></code>: upper bound of the confidence interval</p></li>
+</ul>
+</dd>
+</dl>
+<p>If <code class="docutils literal notranslate"><span class="pre">colorlevel</span></code> is supplied, then the DataFrame must also contain a column with the
+name <code class="docutils literal notranslate"><span class="pre">colorlevel</span></code>.</p>
+</dd>
+<dt>impulse<span class="classifier">str, optional</span></dt><dd><p>Name of the impulse variable. The default is None, in which case the DataFrame must
+contain a single IRF.</p>
+</dd>
+<dt>response<span class="classifier">str, optional</span></dt><dd><p>Name of the response variable. The default is None, in which case the DataFrame must
+contain a single IRF.</p>
+</dd>
+<dt>interaction<span class="classifier">str, optional</span></dt><dd><p>Name of the interaction variable. The default is None.</p>
+</dd>
+<dt>colorlevel<span class="classifier">str, optional</span></dt><dd><p>Name of the column in <code class="docutils literal notranslate"><span class="pre">dftmp</span></code> that indexes the dimension that will be represented by color.
+The default is ‘interaction’.</p>
+</dd>
+<dt>colorvalues<span class="classifier">list, optional</span></dt><dd><p>List of values of <code class="docutils literal notranslate"><span class="pre">colorlevel</span></code> to plot. The default is None, in which case all values
+of the <code class="docutils literal notranslate"><span class="pre">colorlevel</span></code> column are plotted.</p>
+</dd>
+<dt>ax<span class="classifier">matplotlib Axes, optional</span></dt><dd><p>Axes on which to plot. The default is None, in which case a new figure and axes are created.</p>
+</dd>
+<dt>colormap<span class="classifier">list, optional</span></dt><dd><p>List of colors to use for each value of <code class="docutils literal notranslate"><span class="pre">colorvalues</span></code>. The default is None, in which case
+the default matplotlib color cycle is used.</p>
+</dd>
+<dt>legend_here<span class="classifier">bool, optional</span></dt><dd><p>Whether to plot the legend on the axes. The default is True.</p>
+</dd>
+<dt>title_fcn<span class="classifier">function, optional</span></dt><dd><p>Function that takes <code class="docutils literal notranslate"><span class="pre">impulse</span></code>, <code class="docutils literal notranslate"><span class="pre">response</span></code>, and <code class="docutils literal notranslate"><span class="pre">interaction</span></code> as arguments and returns
+a string to use as the title. The default is None, in which case the title is
+<code class="docutils literal notranslate"><span class="pre">impulse</span></code> on <code class="docutils literal notranslate"><span class="pre">response</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.plot_irfs">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">plot_irfs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dfirf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impulses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">responses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'impulse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'response'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interaction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">styles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.plot_irfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a grid of impulse response functions.</p>
+<dl>
+<dt>dfirf<span class="classifier">DataFrame</span></dt><dd><dl class="simple">
+<dt>DataFrame containing the impulse responses. It must contain the following indices:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">impulse</span></code>: name of the impulse variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">response</span></code>: name of the response variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">horizon</span></code>: forecast horizon</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interaction</span></code>: optional, name of the interaction variable</p></li>
+</ul>
+</dd>
+<dt>It must also contain the following columns:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">coef</span></code>: impulse response function</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lb</span></code>: lower bound of the confidence interval</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ub</span></code>: upper bound of the confidence interval</p></li>
+</ul>
+</dd>
+</dl>
+<p>The first argument returned by <code class="docutils literal notranslate"><span class="pre">estimate()</span></code> is a suitable DataFrame.</p>
+</dd>
+<dt>impulses<span class="classifier">list, optional</span></dt><dd><p>List of impulse variables to plot. The default is None, in which case all
+impulse variables in <code class="docutils literal notranslate"><span class="pre">dfirf</span></code> are plotted.</p>
+</dd>
+<dt>responses<span class="classifier">list, optional</span></dt><dd><p>List of response variables to plot. The default is None, in which case all
+response variables in <code class="docutils literal notranslate"><span class="pre">dfirf</span></code> are plotted.</p>
+</dd>
+<dt>interactions<span class="classifier">list, optional</span></dt><dd><p>List of interaction variables to plot. The default is None, in which case all
+interaction variables in <code class="docutils literal notranslate"><span class="pre">dfirf</span></code> are plotted.</p>
+</dd>
+<dt>rows<span class="classifier">str, optional</span></dt><dd><p>Name of the index level to use for the rows of the grid. The default is ‘impulse’.</p>
+</dd>
+<dt>columns<span class="classifier">str, optional</span></dt><dd><p>Name of the index level to use for the columns of the grid. The default is ‘response’.</p>
+</dd>
+<dt>color<span class="classifier">str, optional</span></dt><dd><p>Name of the index level to use for the color of the lines. The default is ‘interaction’.</p>
+</dd>
+<dt>colormap<span class="classifier">list, optional</span></dt><dd><p>List of colors to use for each value of <code class="docutils literal notranslate"><span class="pre">colorvalues</span></code>. The default is None, in which case
+the default matplotlib color cycle is used.</p>
+</dd>
+<dt>styles<span class="classifier">list, optional</span></dt><dd><p>NOT IMPLEMENTED YET: List of line styles to use for each value of <code class="docutils literal notranslate"><span class="pre">colorvalues</span></code>. The default is None, in which
+case the default matplotlib line styles are used.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="localprojections.set_lags">
+<span class="sig-prename descclassname"><span class="pre">localprojections.</span></span><span class="sig-name descname"><span class="pre">set_lags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endogvars_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#localprojections.set_lags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign the same max lags for each endogenous variable. Returns a dict 
+with the same keys as <code class="docutils literal notranslate"><span class="pre">endogvars_list</span></code> and the same value for all keys.</p>
+</dd></dl>
+
 </section>
 <section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
