@@ -1,0 +1,15 @@
+name: ectx
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - statsmodels>=0.13.5
+  - pandas>=1.5.2
+  - patsy>=0.5.3
+  - numpy>=1.23.5
+  - matplotlib>=3.7.1
+  - pip>=23.0.1
+  - pip:
+    - linearmodels>=4.27
+
+#prefix: C:\Users\elene\anaconda3\envs\ectx
