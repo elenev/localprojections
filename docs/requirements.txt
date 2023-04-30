@@ -1,4 +1,5 @@
 sphinx
+sphinx_rtd_theme
 linearmodels>=4.27
 matplotlib>=3.7.1
 numpy>=1.23.5
