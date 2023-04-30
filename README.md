@@ -1,6 +1,6 @@
 # Local Projections in Python
 
-This package implements local projections in Python. It is based on the [R package](lpirfs) and Jorda (2005) paper.
+This package implements local projections in Python. It is based on the R package lpirfs and Jorda (2005) paper.
 
 ## Installation
 This package is not yet registered on PyPI. To install, clone the repository and run `pip install .` in the root directory.
