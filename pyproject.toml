@@ -1,22 +1,28 @@
-[project]
+[tool.poetry]
 name = "localprojections"
 version = "0.0.1"
-authors = [
-  { name="Vadim Elenev", email="elenev@live.com" },
-]
+authors = ["Vadim Elenev"]
 description = "Jorda (2005) Local Projections in Python"
 readme = "README.md"
-requires-python = ">=3.10"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
+license = "MIT"
 
 [project.urls]
 "Homepage" = "https://github.com/elenev/localprojections"
 "Bug Tracker" = "https://github.com/elenev/localprojections/issues"
 
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.0.1"
+numpy = "^1.24.3"
+matplotlib = "^3.7.1"
+statsmodels = "^0.13.5"
+patsy = "^0.5.3"
+linearmodels = "^4.31"
+
+[tool.poetry.group.examples.dependencies]
+country-converter = "^1.0.0"
+ipykernel = "^6.22.0"
