@@ -1,0 +1,26 @@
+# Compiled Python files
+__pycache__/
+*.pyc
+
+# Distribution / packaging
+.Python
+env/
+build/
+dist/
+eggs/
+*.egg-info/
+.eggs/
+*.egg
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
