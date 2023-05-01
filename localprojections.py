@@ -145,7 +145,7 @@ class LP:
 
         # Only keep the columns of df that we need
         allvars = endogvars.keys()|set(responsevars)
-        if shocks is not None:
+        if len(shocks)>0:
             allvars.update(shocks)
         if interaction is not None:
             allvars.add(interaction)
@@ -158,6 +158,7 @@ class LP:
         if (timelevel is None):
             # Panel dataset but timelevel not supplied. Assume it's the last one.
             timelevel = df.index.names[-1]
+            timelevel = timelevel if timelevel is not None else "index"
 
         # Determine index names and whether the data is time series or panel
         nlevels = df.index.nlevels
@@ -215,7 +216,7 @@ class LP:
         self.cluster = cluster
         self.trend = trend
 
-        if shocks is None:
+        if len(shocks)==0:
             # No shocks are supplied. Need to identify them.
             self.offset = 0
             self.ortho = self.orthogonalize(identification)
@@ -290,12 +291,13 @@ class LP:
 
         # namedict maps the coefficient labels in the regression output to
         # impulse labels in the IRF output.
-        if shocks is not None:
+        if len(shocks)>0:
             # If shocks are supplied, use them as RHS variables.
             rhs_shock = ' + '.join(shocks)
             namedict = {shock: shock for shock in shocks}
         else:
             # If shocks are not supplied, use the endogenous variables as RHS variables.
+            rhs_shock = ''
             namedict = {f'lag({envar}, 1)':envar for envar in endogvars}
 
         # Add trend
@@ -670,6 +672,10 @@ class LP:
         # Organize the output
         coefs.reset_index(inplace=True)
         impulses = [x for x in [*shocks, *endogvars] if x in set(coefs['impulse'])]
+
+        # drop duplicates from impulses preserving order
+        impulses = list(dict.fromkeys(impulses))
+
         coefs['impulse'] = pd.Categorical(coefs['impulse'], categories=impulses, ordered=True)
         coefs['response'] = pd.Categorical(coefs['response'], categories=responsevars, ordered=True)
         
@@ -682,7 +688,7 @@ class LP:
     
         # Rescale coefficients by shock_size
         if shock_size is not None:
-            if self.shocks is not None:
+            if len(self.shocks)>0:
                 shock_size = make_iterable(shock_size,shocks)
                 index_names = coefs.index.names
                 coefs.reset_index(inplace=True)
@@ -734,7 +740,7 @@ def drop_singletons(df,level):
     """
     all_levels = df.index.names
     df = df.reset_index()
-    counts = df[all_levels].groupby(level)['qdate'].count()
+    counts = df[all_levels].groupby(level)[all_levels].count().max(axis=1)
     counts = counts[counts==1]
     #return df.loc[df[level].isin(counts.index),:].set_index(all_levels)
     return counts.index
@@ -816,7 +822,7 @@ def make_iterable(x,n=1):
          - ``n`` is a list, return a dictionary with keys ``n`` and values ``x`` 
     """
     if x is None:
-        return None
+        return []
     if isinstance(x,Iterable) and not isinstance(x,str):
         return x
     else:
@@ -926,7 +932,7 @@ def plot_irf(dftmp, impulse=None, response=None, interaction=None,\
         lambda response, impulse, interaction: f'{impulse} on {response}'
 
     # Filter dataframe to the desired colorvalues
-    dftmp.reset_index(inplace=True)
+    dftmp = dftmp.reset_index()
     multiplot = False
     if colorlevel in dftmp.columns:
         if colorvalues is None:
